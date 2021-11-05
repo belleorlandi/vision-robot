@@ -90,13 +90,34 @@ criteria_stereo= (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 # This step is performed to transformation between the two cameras and calculate Essential and Fundamenatl matrix
 retS, new_mtxL, distL, new_mtxR, distR, Rot, Trns, Emat, Fmat = cv2.stereoCalibrate(obj_pts, img_ptsL, img_ptsR, new_mtxL, distL, new_mtxR, distR, imgL_gray.shape[::-1], criteria_stereo, flags)
-
+print("new_mtxL: \n")
+print(new_mtxL)
+print("distL : \n")
+print(distL)
+print("new_mtxR : \n")
+print(new_mtxR)
+print("distR : \n")
+print(distR)
+print("Rot: \n")
+print(Rot)
+print("Trns: \n")
+print(Trns)
+print("Emat: \n")
+print(Emat)
+print("Fmat \n")
+print(Fmat)
 
 #-------------------------
 #STEREO RETIFICATION
 
 rectify_scale= 1
 rect_l, rect_r, proj_mat_l, proj_mat_r, Q, roiL, roiR= cv2.stereoRectify(new_mtxL, distL, new_mtxR, distR, imgL_gray.shape[::-1], Rot, Trns, rectify_scale,(0,0))
+print("proj_mat_l \n")
+print(proj_mat_l)
+print("proj_mat_r: \n")
+print(proj_mat_r)
+
+
 
 #-------------------------
 # REMAPPING
@@ -112,4 +133,14 @@ cv_file.write("Left_Stereo_Map_x",Left_Stereo_Map[0])
 cv_file.write("Left_Stereo_Map_y",Left_Stereo_Map[1])
 cv_file.write("Right_Stereo_Map_x",Right_Stereo_Map[0])
 cv_file.write("Right_Stereo_Map_y",Right_Stereo_Map[1])
+
+
+Left_nice= cv2.remap(imgL,Left_Stereo_Map[0],Left_Stereo_Map[1], cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
+Right_nice= cv2.remap(imgR,Right_Stereo_Map[0],Right_Stereo_Map[1], cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
+
+cv2.imshow("Left image after rectification", Left_nice)
+cv2.imshow("Right image after rectification", Right_nice)
+cv2.waitKey(0)
+
 cv_file.release()
+

@@ -1,13 +1,14 @@
 import numpy as np 
 import cv2
+from matplotlib import pyplot as plt
 
 # Check for left and right camera IDs
 # These values can change depending on the system
-# CamL_id = 2 # Camera ID for left camera
-# CamR_id = 1 # Camera ID for right camera
+CamL_id = 2 # Camera ID for left camera
+CamR_id = 1 # Camera ID for right camera
 
-# CamL= cv2.VideoCapture(CamL_id)
-# CamR= cv2.VideoCapture(CamR_id)
+CamL= cv2.VideoCapture(CamL_id)
+CamR= cv2.VideoCapture(CamR_id)
 
 # Reading the mapping values for stereo image rectification
 cv_file = cv2.FileStorage("improved_params2.xml", cv2.FILE_STORAGE_READ)
@@ -38,34 +39,64 @@ cv2.createTrackbar('minDisparity','disp',5,25,nothing)
 # Creating an object of StereoBM algorithm
 stereo = cv2.StereoBM_create()
 
-imgL = cv2.imread('colorLeft1.jpg')
-cv2.imshow('left', imgL)
-imgR = cv2.imread('colorRight1.jpg')
-cv2.imshow('right', imgR)
+# imgL = cv2.imread('colorLeft1.jpg') #mudei aqui
+# cv2.imshow('left', imgL)
+# imgR = cv2.imread('colorRight1.jpg') #mudei aqui
+# cv2.imshow('right', imgR)
 
-imgR_gray = cv2.cvtColor(imgR,cv2.COLOR_BGR2GRAY)
-imgL_gray = cv2.cvtColor(imgL,cv2.COLOR_BGR2GRAY)
+# retL, imgL = CamL.read() 
+# cv2.imshow('frameL', imgL) # exibe imagem 	
+# retR, imgR = CamR.read() 
+# cv2.imshow('frameR', imgR) # exibe imagem 	
 
-# Applying stereo image rectification on the left image
-Left_nice= cv2.remap(imgL_gray,
-							Left_Stereo_Map_x,
-							Left_Stereo_Map_y,
-							cv2.INTER_LANCZOS4,
-							cv2.BORDER_CONSTANT,
-							0)
+# imgR_gray = cv2.cvtColor(imgR,cv2.COLOR_BGR2GRAY)
+# imgL_gray = cv2.cvtColor(imgL,cv2.COLOR_BGR2GRAY)
+
+# # Applying stereo image rectification on the left image
+# Left_nice= cv2.remap(imgL_gray,
+# 							Left_Stereo_Map_x,
+# 							Left_Stereo_Map_y,
+# 							cv2.INTER_LANCZOS4,
+# 							cv2.BORDER_CONSTANT,
+# 							0)
 		
-# Applying stereo image rectification on the right image
-Right_nice= cv2.remap(imgR_gray,
-							Right_Stereo_Map_x,
-							Right_Stereo_Map_y,
-							cv2.INTER_LANCZOS4,
-							cv2.BORDER_CONSTANT,
-							0)
+# # Applying stereo image rectification on the right image
+# Right_nice= cv2.remap(imgR_gray,
+# 							Right_Stereo_Map_x,
+# 							Right_Stereo_Map_y,
+# 							cv2.INTER_LANCZOS4,
+# 							cv2.BORDER_CONSTANT,
+# 							0)
 
 # cv2.imshow("left nice", Left_nice)
 # cv2.imshow("right nice", Right_nice)
 
 while True:
+	retL, imgL = CamL.read() 
+	# cv2.imshow('frameL', imgL) # exibe imagem 	
+	retR, imgR = CamR.read() 
+	# cv2.imshow('frameR', imgR) # exibe imagem 	
+
+	imgR_gray = cv2.cvtColor(imgR,cv2.COLOR_BGR2GRAY)
+	imgL_gray = cv2.cvtColor(imgL,cv2.COLOR_BGR2GRAY)
+
+	# Applying stereo image rectification on the left image
+	Left_nice= cv2.remap(imgL_gray,
+								Left_Stereo_Map_x,
+								Left_Stereo_Map_y,
+								cv2.INTER_LANCZOS4,
+								cv2.BORDER_CONSTANT,
+								0)
+			
+	# Applying stereo image rectification on the right image
+	Right_nice= cv2.remap(imgR_gray,
+								Right_Stereo_Map_x,
+								Right_Stereo_Map_y,
+								cv2.INTER_LANCZOS4,
+								cv2.BORDER_CONSTANT,
+								0)
+	cv2.imshow("left nice", Left_nice)
+	# cv2.imshow("right nice", Right_nice)
 	# Updating the parameters based on the trackbar positions
 	numDisparities = cv2.getTrackbarPos('numDisparities','disp')*16
 	blockSize = cv2.getTrackbarPos('blockSize','disp')*2 + 5
@@ -93,23 +124,28 @@ while True:
 	stereo.setMinDisparity(minDisparity)
 
 	# Calculating disparity using the StereoBM algorithm
-	# disparity = stereo.compute(Left_nice,Right_nice)
-	disparity = stereo.compute(imgL_gray,imgR_gray)
+	disparity = stereo.compute(Left_nice,Right_nice)
+	# disparity = stereo.compute(imgL_gray,imgR_gray)
 	# NOTE: Code returns a 16bit signed single channel image,
 	# CV_16S containing a disparity map scaled by 16. Hence it 
 	# is essential to convert it to CV_32F and scale it down 16 times.
 
 	# Converting to float32 
 	disparity = disparity.astype(np.float32)
-
+	# plt.imshow(disparity,'gray')
+	# plt.show()
+	
 	# Scaling down the disparity values and normalizing them 
 	disparity = (disparity/16.0 - minDisparity)/numDisparities
 
 	# Displaying the disparity map
 	cv2.imshow('mapa',disparity)
+	# plt.imshow(disparity,'gray')
+	# plt.show()
 
 	# Close window using esc key
 	if cv2.waitKey(1) == 27:
 		break
 	else:
+		# plt.show()
 		cv2.imshow('mapa',disparity)

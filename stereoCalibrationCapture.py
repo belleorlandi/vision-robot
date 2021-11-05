@@ -24,10 +24,8 @@ while(capL.isOpened()):
     [newFileNameL, val] = FilesNames(preNameL, ext)
     # Realiza a captura de frames da direita e esquerda
     retR, frameR = capR.read() 
-    frameR = np.rot90(frameR)
     cv.imshow('CapturaR', frameR)
     retL, frameL = capL.read() 
-    frameL = np.rot90(frameL)
     cv.imshow('CapturaL', frameL)
     pathR = './data/stereoR/'
     pathL = './data/stereoL/'    

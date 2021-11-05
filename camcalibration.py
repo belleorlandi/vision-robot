@@ -8,7 +8,7 @@ import glob
 
 def FilesNames(preName, ext):
 
-    numFiles = len(os.listdir('.')) - 14 #recebe o numero de arquivos no diretorio 
+    numFiles = len(os.listdir('.')) - 11 #recebe o numero de arquivos no diretorio 
     val = numFiles
     newFileName = preName + str(val) + '.' + ext
     return [newFileName, val]
@@ -21,7 +21,6 @@ while(cap.isOpened()):
     [newFileName, val] = FilesNames(preName, ext)
     # Realiza a captura de frames da direita e esquerda
     ret, frame = cap.read() 
-    frame = np.rot90(frame)
     cv.imshow('Captura', frame)
     
     if cv.waitKey(1) & 0xFF == ord('s'):
